@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  optiplant-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Por defecto apunta al backend local en caso de que lo corran todo junto
+        - VITE_API_URL=http://backend:8080 
+    container_name: optiplant-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      # Si hay un backend en el mismo compose, se añade aquí
+      # - backend
+      pass
