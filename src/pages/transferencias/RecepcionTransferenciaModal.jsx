@@ -10,6 +10,17 @@ import { FormField } from '../../components/common/FormField';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 
+/**
+ * Modal para confirmar la recepción de una transferencia de inventario.
+ * Permite ajustar las cantidades finales en la sucursal de destino si ocurren
+ * pérdidas, daños o faltantes durante el trayecto.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Visibilidad del modal.
+ * @param {Function} props.onClose - Cierra el modal.
+ * @param {Function} props.onSave - Callback que ejecuta la acción de recepción.
+ * @param {Object} props.transferencia - Datos de la transferencia que llega a destino.
+ */
 export const RecepcionTransferenciaModal = ({ isOpen, onClose, onSave, transferencia }) => {
   const { register, handleSubmit, control, reset } = useForm({
     defaultValues: { detalles: [] }

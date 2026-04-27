@@ -15,6 +15,10 @@ import {
   Settings
 } from 'lucide-react';
 
+/**
+ * Configuración central del menú de navegación lateral.
+ * Define la estructura, iconos, rutas y permisos necesarios para cada elemento.
+ */
 const MENU_ITEMS = [
   {
     category: 'Inicio',
@@ -49,12 +53,21 @@ const MENU_ITEMS = [
   }
 ];
 
+/**
+ * Componente de Navegación Lateral (Sidebar).
+ * Muestra el menú interactivo con enlaces filtrados según el rol del usuario autenticado.
+ * Es responsivo: actúa como un cajón deslizable en dispositivos móviles y barra fija en desktop.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isMobileOpen - Estado que indica si el menú móvil está abierto.
+ * @param {Function} props.setIsMobileOpen - Función para alternar la visibilidad del menú móvil.
+ */
 export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
   const user = useAuthStore(state => state.user);
 
   return (
     <>
-      {/* Mobile backdrop */}
+      {/* Mobile backdrop para cerrar menú al hacer click fuera */}
       {isMobileOpen && (
         <div 
           className="fixed inset-0 z-40 bg-gray-900/50 md:hidden" 
@@ -62,7 +75,10 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
         />
       )}
       
+      {/* Contenedor principal del sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-100 border-r border-gray-200 transform transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:w-64 md:shrink-0 flex flex-col ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        
+        {/* Cabecera del sidebar (Logo/Marca) */}
         <div className="h-16 flex items-center px-6 bg-white border-b border-gray-200 shrink-0">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 bg-primary-600 rounded flex items-center justify-center">
@@ -72,11 +88,13 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
           </div>
         </div>
 
+        {/* Listado de menús */}
         <div className="flex-1 overflow-y-auto py-4">
           {MENU_ITEMS.map((section, idx) => {
-            // Filtrar items por rol
+            // Filtrar items asegurándose de que el usuario tiene los roles adecuados
             const visibleItems = section.items.filter(item => canAccess(user, item.roles));
             
+            // Si no hay items visibles para la categoría, no se renderiza el encabezado
             if (visibleItems.length === 0) return null;
 
             return (

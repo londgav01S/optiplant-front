@@ -2,6 +2,15 @@ import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/button';
 
+/**
+ * Componente visual para mostrar mensajes de error cuando falla una petición o carga de datos.
+ * Incluye opcionalmente un botón de reintento.
+ * 
+ * @param {Object} props
+ * @param {string} [props.title] - Título principal del error.
+ * @param {string} [props.message] - Detalle del error ocurrido.
+ * @param {Function} [props.onRetry] - Función a ejecutar cuando el usuario haga clic en "Reintentar".
+ */
 export const ErrorState = ({ 
   title = "Ocurrió un error", 
   message = "No pudimos cargar esta información. Por favor, intenta de nuevo.",

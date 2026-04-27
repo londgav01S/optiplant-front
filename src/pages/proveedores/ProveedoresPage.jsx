@@ -7,6 +7,11 @@ import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Plus, Edit, History } from 'lucide-react';
 
+/**
+ * Vista de Listado de Proveedores.
+ * Muestra la tabla principal con el directorio de proveedores de la empresa.
+ * Proporciona acciones rápidas para editar o consultar el historial de compras.
+ */
 export const ProveedoresPage = () => {
   const navigate = useNavigate();
   const { proveedoresQuery } = useProveedores({});

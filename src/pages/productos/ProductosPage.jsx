@@ -9,6 +9,11 @@ import { CurrencyDisplay } from '../../components/common/CurrencyDisplay';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Plus, Edit, Eye, Power, PowerOff } from 'lucide-react';
 
+/**
+ * Vista de Listado de Productos.
+ * Muestra una tabla con todos los productos registrados en el sistema,
+ * permitiendo ver detalle, editar, y activar/desactivar (soft delete).
+ */
 export const ProductosPage = () => {
   const navigate = useNavigate();
   const { productosQuery, desactivarProducto, isDesactivando } = useProductos({});

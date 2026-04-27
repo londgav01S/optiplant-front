@@ -9,6 +9,11 @@ import { formatDate } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
+/**
+ * Vista de Historial del Proveedor.
+ * Muestra una tabla con todas las órdenes de compra asociadas a un proveedor específico,
+ * permitiendo hacer seguimiento de transacciones pasadas.
+ */
 export const ProveedorHistorialPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

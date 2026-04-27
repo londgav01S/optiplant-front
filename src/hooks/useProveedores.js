@@ -3,28 +3,38 @@ import { proveedoresService } from '../services/proveedoresService';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Hook para la gestión del directorio de Proveedores.
+ * 
+ * @param {Object} params - Parámetros de listado (filtros, paginación).
+ * @returns {Object} Consultas y mutaciones asociadas a proveedores.
+ */
 export const useProveedores = (params) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Listado de proveedores
   const proveedoresQuery = useQuery({
     queryKey: ['proveedores', params],
     queryFn: () => proveedoresService.getAll(params),
     staleTime: 30000,
   });
 
+  // Detalle de un proveedor específico
   const getProveedorQuery = (id) => useQuery({
     queryKey: ['proveedores', id],
     queryFn: () => proveedoresService.getById(id),
     enabled: !!id && id !== 'nuevo',
   });
 
+  // Historial de compras o interacciones de un proveedor
   const getHistorialQuery = (id, histParams) => useQuery({
     queryKey: ['proveedores', id, 'historial', histParams],
     queryFn: () => proveedoresService.getHistorial(id, histParams),
     enabled: !!id,
   });
 
+  // Crear un nuevo proveedor
   const createMutation = useMutation({
     mutationFn: proveedoresService.create,
     onSuccess: () => {
@@ -38,6 +48,7 @@ export const useProveedores = (params) => {
     }
   });
 
+  // Modificar información de un proveedor existente
   const updateMutation = useMutation({
     mutationFn: proveedoresService.update,
     onSuccess: (_, variables) => {

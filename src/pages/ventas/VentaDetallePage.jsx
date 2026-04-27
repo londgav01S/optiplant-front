@@ -10,6 +10,11 @@ import { Button } from '../../components/ui/button';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 
+/**
+ * Vista de Detalles de Venta.
+ * Presenta el resumen de una venta, mostrando los productos comprados, subtotales,
+ * y permite confirmar o cancelar la venta si esta se encuentra en estado pendiente.
+ */
 export const VentaDetallePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

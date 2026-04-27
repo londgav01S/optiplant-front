@@ -11,6 +11,11 @@ import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { RecepcionCompraModal } from './RecepcionCompraModal';
 import { ArrowLeft, PackageCheck, XCircle } from 'lucide-react';
 
+/**
+ * Vista de Detalles de Compra.
+ * Muestra el desglose de los productos solicitados a un proveedor.
+ * Permite cambiar el estado de la compra de PENDIENTE a RECIBIDA o CANCELADA.
+ */
 export const CompraDetallePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

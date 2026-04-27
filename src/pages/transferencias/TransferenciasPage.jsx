@@ -10,6 +10,12 @@ import { Plus, Eye } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import { Badge } from '../../components/ui/badge';
 
+/**
+ * Vista de Listado de Transferencias.
+ * Muestra el registro de todos los movimientos inter-sucursales.
+ * Permite a los usuarios consultar transferencias relacionadas con su sucursal,
+ * y a los administradores ver el consolidado global.
+ */
 export const TransferenciasPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();

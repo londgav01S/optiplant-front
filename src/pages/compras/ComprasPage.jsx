@@ -10,6 +10,11 @@ import { formatDate } from '../../utils/formatters';
 import { Plus, Eye } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
+/**
+ * Vista de Listado de Compras.
+ * Muestra el historial de compras realizadas a proveedores.
+ * Administradores ven compras de todas las sucursales, usuarios normales solo de la suya.
+ */
 export const ComprasPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();

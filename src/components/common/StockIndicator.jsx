@@ -1,6 +1,15 @@
 import React from 'react';
 import { formatStock } from '../../utils/formatters';
 
+/**
+ * Componente visual para mostrar el nivel de stock en forma de barra de progreso.
+ * Cambia de color dinámicamente según la cercanía al stock mínimo (verde, amarillo, rojo).
+ * 
+ * @param {Object} props
+ * @param {number} props.current - Cantidad actual de stock disponible.
+ * @param {number} props.min - Stock mínimo requerido antes de generar alerta.
+ * @param {number} [props.max] - Stock máximo teórico para calcular el ancho de la barra.
+ */
 export const StockIndicator = ({ current, min, max }) => {
   // Calculamos el porcentaje relativo al máximo. Si no hay máximo, usamos un múltiplo del mínimo.
   const maxVal = max || (min * 3) || (current * 2) || 100;

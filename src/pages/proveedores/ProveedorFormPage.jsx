@@ -19,6 +19,11 @@ const proveedorSchema = z.object({
   condicionesPago: z.string().optional(),
 });
 
+/**
+ * Vista del Formulario de Proveedores.
+ * Permite la creación y edición de datos de un proveedor.
+ * Reutiliza el mismo componente leyendo el parámetro 'id' de la URL.
+ */
 export const ProveedorFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

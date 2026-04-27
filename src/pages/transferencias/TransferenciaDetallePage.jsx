@@ -21,6 +21,12 @@ const STEPS = [
   { id: 'RECIBIDA', label: 'Recepción' }
 ];
 
+/**
+ * Vista de Detalles de Transferencia.
+ * Muestra el progreso de un movimiento de inventario entre sucursales mediante un timeline visual.
+ * Expone acciones (Aprobar, Rechazar, Despachar, Recibir) dependiendo del estado de la transferencia
+ * y el rol o la sucursal del usuario activo.
+ */
 export const TransferenciaDetallePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

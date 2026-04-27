@@ -10,6 +10,17 @@ import { FormField } from '../../components/common/FormField';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 
+/**
+ * Modal para confirmar la recepción de los productos de una orden de compra.
+ * Permite ajustar las cantidades reales recibidas en caso de que existan faltantes,
+ * asegurando la exactitud del inventario.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Visibilidad del modal.
+ * @param {Function} props.onClose - Cierra el modal.
+ * @param {Function} props.onSave - Callback al enviar las cantidades recibidas.
+ * @param {Object} props.compra - Objeto con la información de la orden a recibir.
+ */
 export const RecepcionCompraModal = ({ isOpen, onClose, onSave, compra }) => {
   const { register, handleSubmit, control, reset } = useForm({
     defaultValues: { detalles: [] }

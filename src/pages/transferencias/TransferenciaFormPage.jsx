@@ -30,6 +30,11 @@ const transferenciaSchema = z.object({
   path: ["sucursalDestinoId"]
 });
 
+/**
+ * Formulario para Solicitar una Nueva Transferencia de Inventario.
+ * Captura las sucursales de origen y destino (evitando que sean la misma)
+ * y la lista de productos solicitados. Solo ADMIN puede cambiar el origen.
+ */
 export const TransferenciaFormPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();

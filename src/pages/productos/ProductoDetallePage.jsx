@@ -8,6 +8,11 @@ import { useProductos } from '../../hooks/useProductos';
 import { Button } from '../../components/ui/button';
 import { ArrowLeft, Edit } from 'lucide-react';
 
+/**
+ * Vista de Detalles del Producto.
+ * Muestra la información completa de un producto específico,
+ * su información general y, en el futuro, el desglose de inventario por sucursales.
+ */
 export const ProductoDetallePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -20,6 +20,11 @@ const productoSchema = z.object({
   precioBase: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0'),
 });
 
+/**
+ * Vista del Formulario de Productos.
+ * Reutilizable tanto para Crear (nuevo) como para Editar (id existente).
+ * Carga automáticamente los datos actuales si es modo edición.
+ */
 export const ProductoFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

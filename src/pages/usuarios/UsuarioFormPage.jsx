@@ -14,7 +14,14 @@ import { useSucursales } from '../../hooks/useSucursales';
 import { requiredString } from '../../utils/validators';
 import { ROLES as ROLES_CONSTANTS } from '../../utils/constants';
 
-// Zod schema dinámico porque password es requerido solo en creación
+/**
+ * Función que genera dinámicamente el esquema de validación para el usuario.
+ * La contraseña es obligatoria en creación y opcional en edición.
+ * Verifica también que si el rol no es ADMIN, la sucursal sea obligatoria.
+ * 
+ * @param {boolean} isEditing - Indica si el formulario es de edición.
+ * @returns {z.ZodObject} Esquema de validación Zod.
+ */
 const getUsuarioSchema = (isEditing) => z.object({
   nombre: requiredString,
   apellido: requiredString,
@@ -32,6 +39,11 @@ const getUsuarioSchema = (isEditing) => z.object({
   }
 });
 
+/**
+ * Vista del Formulario de Usuarios.
+ * Administra la creación y actualización del personal, permitiendo seleccionar
+ * roles y asignar usuarios a sucursales concretas (salvo rol ADMIN).
+ */
 export const UsuarioFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

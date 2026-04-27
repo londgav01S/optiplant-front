@@ -3,28 +3,38 @@ import { ventasService } from '../services/ventasService';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Hook para manejar la lógica de negocio y estado de las Ventas.
+ * 
+ * @param {Object} params - Filtros y parámetros de consulta.
+ * @returns {Object} Consultas y mutaciones de ventas.
+ */
 export const useVentas = (params) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Consulta para el listado general de ventas
   const ventasQuery = useQuery({
     queryKey: ['ventas', params],
     queryFn: () => ventasService.getAll(params),
     staleTime: 30000,
   });
 
+  // Consulta para obtener la información detallada de una venta
   const getVentaQuery = (id) => useQuery({
     queryKey: ['ventas', id],
     queryFn: () => ventasService.getById(id),
     enabled: !!id && id !== 'nuevo',
   });
 
+  // Mutación para registrar una nueva venta
   const createMutation = useMutation({
     mutationFn: ventasService.create,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['ventas'] });
       toast.success('Venta registrada exitosamente');
-      navigate(`/ventas/${data.id || data.data?.id}`); // asumiendo que retorna el id creado
+      // asumiendo que el backend retorna el id creado
+      navigate(`/ventas/${data.id || data.data?.id}`); 
     },
     onError: (error) => {
       const msg = error.response?.data?.message || 'Error al registrar la venta';
@@ -32,6 +42,7 @@ export const useVentas = (params) => {
     }
   });
 
+  // Mutación para confirmar la venta (ej. despacho final, actualización de inventario)
   const confirmarMutation = useMutation({
     mutationFn: ventasService.confirmar,
     onSuccess: (_, id) => {
@@ -45,6 +56,7 @@ export const useVentas = (params) => {
     }
   });
 
+  // Mutación para cancelar o anular una venta
   const cancelarMutation = useMutation({
     mutationFn: ventasService.cancelar,
     onSuccess: (_, id) => {

@@ -21,6 +21,17 @@ const ajusteSchema = z.object({
   motivo: requiredString,
 });
 
+/**
+ * Modal para realizar ajustes de inventario (ingresos/salidas manuales).
+ * Permite cambiar la cantidad actual por una nueva y calcular la diferencia.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Visibilidad del modal.
+ * @param {Function} props.onClose - Función para cerrar el modal.
+ * @param {Object} props.inventario - Objeto con los datos del inventario a modificar.
+ * @param {Function} props.onAjustar - Callback que envía los datos del formulario.
+ * @param {boolean} props.isAjustando - Indica si la petición está en curso para deshabilitar controles.
+ */
 export const AjusteStockModal = ({ isOpen, onClose, inventario, onAjustar, isAjustando }) => {
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
     resolver: zodResolver(ajusteSchema),

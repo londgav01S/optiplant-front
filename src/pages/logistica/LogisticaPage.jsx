@@ -16,6 +16,13 @@ const ESTADOS_RUTA = {
   ENTREGADA: 'bg-success-100 text-success-600 border-success-200',
 };
 
+/**
+ * Vista del Módulo de Logística y Rutas.
+ * Muestra el panel de control de entregas y transferencias en tránsito.
+ * Se divide en dos pestañas: 
+ * 1. Reporte de Cumplimiento (estadísticas e histórico).
+ * 2. Mercancía en Tránsito (rutas activas que pueden ser actualizadas).
+ */
 export const LogisticaPage = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.rolNombre === 'ADMIN';

@@ -27,6 +27,11 @@ const ventaSchema = z.object({
   detalles: z.array(ventaDetalleSchema).min(1, 'Debe agregar al menos un producto'),
 });
 
+/**
+ * Formulario para el Registro de una Nueva Venta.
+ * Utiliza `useFieldArray` para manejar una lista dinámica de productos.
+ * Autocompleta el precio base de los productos seleccionados y calcula el total.
+ */
 export const VentaFormPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();

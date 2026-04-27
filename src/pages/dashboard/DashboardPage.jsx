@@ -20,17 +20,25 @@ import {
 import { formatDate } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 
+/**
+ * Vista del Dashboard Principal.
+ * Presenta un resumen general de las operaciones de la empresa o sucursal.
+ * Incluye KPIs (Ventas, Compras, Alertas), gráficos interactivos (Recharts) 
+ * y listados de notificaciones urgentes.
+ */
 export const DashboardPage = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.rolNombre === 'ADMIN';
   const navigate = useNavigate();
 
+  // Filtro de sucursal automático: los admin ven global (null), los demás su propia sucursal
   const params = { sucursalId: isAdmin ? null : user?.sucursalId };
   
+  // Hooks para obtener datos del resumen
   const { metricasQuery } = useDashboard(params);
   const { alertasQuery, marcarLeida } = useAlertas(params);
 
-  // Valores por defecto
+  // Valores por defecto o datos simulados (mock) en caso de que el backend no envíe datos
   const metricas = metricasQuery.data || {
     ventasMes: 0,
     comprasMes: 0,

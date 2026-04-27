@@ -9,13 +9,19 @@ import { AjusteStockModal } from './AjusteStockModal';
 import { ArrowRightLeft, Search } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
+/**
+ * Vista de Gestión de Inventario.
+ * Muestra el catálogo de productos con su stock actual en la sucursal correspondiente.
+ * Provee filtros básicos y acción para realizar ajustes manuales de stock.
+ */
 export const InventarioPage = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.rolNombre === 'ADMIN';
   
-  // Por ahora filtros simples
+  // Estado local para los filtros
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Hook de obtención de datos
   // Si no es admin, el backend debería filtrar automáticamente por su sucursal,
   // pero podemos enviar el param explícitamente si la API lo requiere.
   const { inventarioQuery, ajustarStock, isAjustando } = useInventario({ 

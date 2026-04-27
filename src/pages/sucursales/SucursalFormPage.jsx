@@ -17,6 +17,11 @@ const sucursalSchema = z.object({
   telefono: z.string().optional(),
 });
 
+/**
+ * Vista del Formulario de Sucursales.
+ * Permite registrar nuevas sedes o editar la información básica de las existentes.
+ * Solo debe ser accesible para administradores.
+ */
 export const SucursalFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

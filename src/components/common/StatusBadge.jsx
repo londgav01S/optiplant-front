@@ -17,6 +17,13 @@ const ALL_STATUSES = {
   ...NIVELES_URGENCIA,
 };
 
+/**
+ * Componente visual de etiqueta (Badge) coloreada que representa el estado de una entidad.
+ * Mapea la constante string (ej. "EN_TRANSITO") a su texto legible y color correspondiente.
+ * 
+ * @param {Object} props
+ * @param {string} props.status - Código o identificador del estado (viene del backend).
+ */
 export const StatusBadge = ({ status }) => {
   if (!status) return null;
   

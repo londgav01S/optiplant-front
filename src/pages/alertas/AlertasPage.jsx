@@ -20,6 +20,11 @@ const BORDERS = {
   INFO: 'border-l-4 border-l-info-500'
 };
 
+/**
+ * Vista de Alertas de Sistema.
+ * Muestra el listado de notificaciones importantes (ej. stock bajo).
+ * Permite marcar las alertas como leídas e incluye filtrado de vista por roles.
+ */
 export const AlertasPage = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.rolNombre === 'ADMIN';

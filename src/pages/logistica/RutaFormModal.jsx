@@ -19,6 +19,16 @@ const rutaSchema = z.object({
   conductor: requiredString,
 });
 
+/**
+ * Modal para asignar una nueva ruta a una transferencia.
+ * Captura datos del vehículo y del conductor encargado del traslado.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Define si el modal es visible.
+ * @param {Function} props.onClose - Cierra el modal.
+ * @param {Function} props.onSave - Callback al enviar el formulario válido.
+ * @param {boolean} props.isSaving - Estado de carga durante el guardado.
+ */
 export const RutaFormModal = ({ isOpen, onClose, onSave, isSaving }) => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: zodResolver(rutaSchema),

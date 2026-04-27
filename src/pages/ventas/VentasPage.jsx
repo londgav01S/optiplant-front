@@ -10,6 +10,11 @@ import { formatDate } from '../../utils/formatters';
 import { Plus, Eye } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
+/**
+ * Vista de Listado de Ventas.
+ * Muestra el registro histórico de las ventas de la sucursal del usuario
+ * (o de todas las sucursales si es ADMIN).
+ */
 export const VentasPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();

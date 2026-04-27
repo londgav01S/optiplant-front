@@ -3,22 +3,31 @@ import { transferenciasService } from '../services/transferenciasService';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Hook para la gestión de las Transferencias de inventario entre sucursales.
+ * 
+ * @param {Object} params - Parámetros de listado y filtrado.
+ * @returns {Object} Consultas y mutaciones de transferencias.
+ */
 export const useTransferencias = (params) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Lista de transferencias
   const transferenciasQuery = useQuery({
     queryKey: ['transferencias', params],
     queryFn: () => transferenciasService.getAll(params),
     staleTime: 30000,
   });
 
+  // Detalle de una transferencia
   const getTransferenciaQuery = (id) => useQuery({
     queryKey: ['transferencias', id],
     queryFn: () => transferenciasService.getById(id),
     enabled: !!id && id !== 'nuevo',
   });
 
+  // Crear una solicitud de transferencia
   const createMutation = useMutation({
     mutationFn: transferenciasService.create,
     onSuccess: (data) => {
@@ -32,6 +41,7 @@ export const useTransferencias = (params) => {
     }
   });
 
+  // Marcar transferencia como despachada/enviada
   const enviarMutation = useMutation({
     mutationFn: transferenciasService.enviar,
     onSuccess: (_, id) => {
@@ -45,6 +55,7 @@ export const useTransferencias = (params) => {
     }
   });
 
+  // Confirmar recepción de una transferencia
   const recibirMutation = useMutation({
     mutationFn: transferenciasService.recibir,
     onSuccess: (_, id) => {
@@ -58,6 +69,7 @@ export const useTransferencias = (params) => {
     }
   });
 
+  // Anular una transferencia no completada
   const cancelarMutation = useMutation({
     mutationFn: transferenciasService.cancelar,
     onSuccess: (_, id) => {

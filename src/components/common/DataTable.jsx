@@ -13,6 +13,18 @@ import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { EmptyState } from "./EmptyState";
 
+/**
+ * Componente de Tabla de Datos universal.
+ * Soporta estados de carga (skeletons), estados vacíos, y paginación.
+ * 
+ * @param {Object} props
+ * @param {Array} props.columns - Configuración de columnas (header, accessorKey, cell, className).
+ * @param {Array} props.data - Arreglo de objetos con los datos a mostrar.
+ * @param {boolean} [props.isLoading=false] - Muestra Skeletons si es verdadero.
+ * @param {React.ReactNode} [props.emptyState] - Componente a mostrar si la tabla no tiene datos.
+ * @param {Object} [props.pageParams] - Parámetros de paginación (number, totalPages, totalElements).
+ * @param {Function} [props.onPageChange] - Callback que recibe el nuevo número de página al navegar.
+ */
 export const DataTable = ({
   columns,
   data = [],

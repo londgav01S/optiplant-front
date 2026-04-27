@@ -10,6 +10,17 @@ import { FormField } from '../../components/common/FormField';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 
+/**
+ * Modal para registrar la salida (despacho) de una transferencia.
+ * Captura datos logísticos básicos (vehículo, conductor) antes de mover
+ * la mercancía al estado "EN_TRANSITO".
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Visibilidad del modal.
+ * @param {Function} props.onClose - Cierra el modal.
+ * @param {Function} props.onSave - Callback que ejecuta la acción de despacho.
+ * @param {Object} props.transferencia - Información de la transferencia actual.
+ */
 export const DespachoModal = ({ isOpen, onClose, onSave, transferencia }) => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 

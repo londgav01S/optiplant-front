@@ -1,6 +1,14 @@
 import React from 'react';
 import { PackageX } from 'lucide-react';
 
+/**
+ * Componente visual para mostrar cuando no hay datos disponibles (ej. tablas o listas vacías).
+ * 
+ * @param {Object} props
+ * @param {string} [props.title] - Título principal del mensaje de estado vacío.
+ * @param {string} [props.description] - Descripción detallada o instrucciones para el usuario.
+ * @param {React.ReactNode} [props.icon] - Ícono a mostrar (por defecto usa PackageX de lucide-react).
+ */
 export const EmptyState = ({ 
   title = "No hay resultados", 
   description = "No encontramos elementos que coincidan con tu búsqueda.",

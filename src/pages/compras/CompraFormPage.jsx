@@ -27,6 +27,11 @@ const compraSchema = z.object({
   detalles: z.array(compraDetalleSchema).min(1, 'Debe agregar al menos un producto'),
 });
 
+/**
+ * Formulario para el Registro de una Nueva Orden de Compra.
+ * Permite seleccionar al proveedor e ingresar los productos mediante un formulario dinámico.
+ * Calcula el total en tiempo real.
+ */
 export const CompraFormPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();

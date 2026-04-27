@@ -3,22 +3,31 @@ import { usuariosService } from '../services/usuariosService';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Hook para la administración del personal y Usuarios del sistema.
+ * 
+ * @param {Object} params - Parámetros de consulta y paginación.
+ * @returns {Object} Consultas y mutaciones de usuarios.
+ */
 export const useUsuarios = (params) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Consulta para el listado de usuarios
   const usuariosQuery = useQuery({
     queryKey: ['usuarios', params],
     queryFn: () => usuariosService.getAll(params),
     staleTime: 30000,
   });
 
+  // Consulta de perfil de usuario específico
   const getUsuarioQuery = (id) => useQuery({
     queryKey: ['usuarios', id],
     queryFn: () => usuariosService.getById(id),
     enabled: !!id && id !== 'nuevo',
   });
 
+  // Crear un nuevo usuario en la base de datos
   const createMutation = useMutation({
     mutationFn: usuariosService.create,
     onSuccess: () => {
@@ -32,6 +41,7 @@ export const useUsuarios = (params) => {
     }
   });
 
+  // Modificar permisos o datos de un usuario
   const updateMutation = useMutation({
     mutationFn: usuariosService.update,
     onSuccess: (_, variables) => {
@@ -46,6 +56,7 @@ export const useUsuarios = (params) => {
     }
   });
 
+  // Activar/Desactivar el acceso de un usuario
   const toggleEstadoMutation = useMutation({
     mutationFn: usuariosService.toggleEstado,
     onSuccess: () => {

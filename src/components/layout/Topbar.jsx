@@ -13,9 +13,21 @@ import {
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 
+/**
+ * Barra de navegación superior.
+ * Incluye botón de menú para móviles e información del perfil del usuario logueado.
+ * 
+ * @param {Object} props
+ * @param {Function} props.setIsMobileOpen - Función para abrir el menú lateral en pantallas pequeñas.
+ */
 export const Topbar = ({ setIsMobileOpen }) => {
   const { user, logout } = useAuthStore();
 
+  /**
+   * Asigna un color específico al Badge (etiqueta visual) según el rol del usuario.
+   * @param {string} rolNombre - Nombre del rol ('ADMIN', 'GERENTE', 'OPERADOR').
+   * @returns {string} Clases CSS de Tailwind.
+   */
   const getRoleColor = (rolNombre) => {
     switch (rolNombre) {
       case 'ADMIN': return 'bg-[#7C3AED] text-white hover:bg-[#7C3AED]/80';
@@ -25,11 +37,13 @@ export const Topbar = ({ setIsMobileOpen }) => {
     }
   };
 
+  // Iniciales generadas a partir del nombre para usarlas como fallback en el avatar
   const initials = user?.nombre ? user.nombre.substring(0, 2).toUpperCase() : 'US';
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 shrink-0">
       <div className="flex items-center">
+        {/* Botón hamburguesa (solo visible en móvil) */}
         <button
           type="button"
           className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-md focus:outline-none"
@@ -39,18 +53,20 @@ export const Topbar = ({ setIsMobileOpen }) => {
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
         <div className="hidden md:flex text-sm text-gray-500">
-          {/* Aquí iría el breadcrumb dinámico. Por ahora es un placeholder */}
+          {/* Aquí iría el breadcrumb dinámico. Por ahora es un placeholder genérico */}
           Sistema de Inventario
         </div>
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Etiqueta visible del rol del usuario */}
         {user && (
           <Badge className={`hidden sm:inline-flex ${getRoleColor(user.rolNombre)} border-0`}>
             {user.rolNombre}
           </Badge>
         )}
         
+        {/* Menú desplegable del perfil de usuario */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 rounded-full flex items-center gap-2 pl-2 pr-0 sm:pr-2">

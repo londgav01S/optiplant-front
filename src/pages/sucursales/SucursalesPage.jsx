@@ -8,6 +8,11 @@ import { Badge } from '../../components/ui/badge';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Plus, Edit, Power, PowerOff } from 'lucide-react';
 
+/**
+ * Vista de Listado de Sucursales.
+ * Muestra todas las sedes registradas en el sistema.
+ * Permite activarlas o desactivarlas, lo que afecta el alcance de las operaciones.
+ */
 export const SucursalesPage = () => {
   const navigate = useNavigate();
   const { sucursalesQuery, desactivarSucursal, isDesactivando } = useSucursales();

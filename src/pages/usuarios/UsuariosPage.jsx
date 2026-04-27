@@ -8,6 +8,11 @@ import { Badge } from '../../components/ui/badge';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Plus, Edit, Power, PowerOff } from 'lucide-react';
 
+/**
+ * Vista de Listado de Usuarios.
+ * Muestra una tabla con el personal registrado en el sistema.
+ * Permite cambiar su estado (Activo/Inactivo) mediante un modal de confirmación.
+ */
 export const UsuariosPage = () => {
   const navigate = useNavigate();
   // En una versión más avanzada se pueden manejar paginación y filtros desde el estado

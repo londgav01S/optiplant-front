@@ -11,6 +11,11 @@ import { useAuth } from '../../hooks/useAuth';
 import useAuthStore from '../../store/authStore';
 import { Package } from 'lucide-react';
 
+/**
+ * Vista de inicio de sesión.
+ * Contiene el formulario de autenticación, validación con Zod/React Hook Form,
+ * e integración con el hook `useAuth` para comunicarse con el backend.
+ */
 export const LoginPage = () => {
   const navigate = useNavigate();
   const { login, isLoggingIn, loginError } = useAuth();
