@@ -1,18 +1,56 @@
-version: '3.8'
-
 services:
-  optiplant-frontend:
+  db:
+    image: postgres:16-alpine
+    container_name: optiplant-db
+    env_file:
+      - ../aptiplant-back/.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-inventario_db}
+      POSTGRES_USER: ${POSTGRES_USER:-inventario_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-inventario_pass}
+    ports:
+      - "5433:5432"
+    volumes:
+      - optiplant_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ../aptiplant-back
+      dockerfile: Dockerfile
+    container_name: optiplant-backend
+    env_file:
+      - ../aptiplant-back/.env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-inventario_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-inventario_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-inventario_pass}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        # Por defecto apunta al backend local en caso de que lo corran todo junto
-        - VITE_API_URL=http://backend:8080 
+        VITE_API_URL: http://localhost:8080/api
     container_name: optiplant-frontend
     ports:
-      - "80:80"
-    restart: unless-stopped
+      - "3000:80"
     depends_on:
-      # Si hay un backend en el mismo compose, se añade aquí
-      # - backend
-      pass
+      - backend
+    restart: unless-stopped
+
+volumes:
+  optiplant_pg_data:
