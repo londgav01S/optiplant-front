@@ -50,6 +50,10 @@ export const useCompras = (params) => {
       // Invalida tanto la lista general como el detalle de la compra específica
       queryClient.invalidateQueries({ queryKey: ['compras'] });
       queryClient.invalidateQueries({ queryKey: ['compras', id] });
+      // Refresca pantallas que dependen del stock tras la recepción
+      queryClient.invalidateQueries({ queryKey: ['inventario'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['alertas'] });
       toast.success('Compra recibida. Inventario actualizado.');
     },
     onError: (error) => {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PageHeader } from '../../components/common/PageHeader';
@@ -8,16 +8,14 @@ import { FormField } from '../../components/common/FormField';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
-import { Textarea } from '../../components/ui/textarea'; // Assuming we have textarea or we can use input
 import { useProductos } from '../../hooks/useProductos';
 import { requiredString } from '../../utils/validators';
 
 const productoSchema = z.object({
-  codigo: requiredString,
+  sku: requiredString,
   nombre: requiredString,
   descripcion: z.string().optional(),
-  categoria: requiredString,
-  precioBase: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0'),
+  precioBase: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0').optional().nullable(),
 });
 
 /**
@@ -36,31 +34,36 @@ export const ProductoFormPage = () => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: zodResolver(productoSchema),
     defaultValues: {
-      codigo: '',
+      sku: '',
       nombre: '',
       descripcion: '',
-      categoria: '',
-      precioBase: 0,
+      precioBase: '',
     }
   });
 
   useEffect(() => {
     if (productoActual && isEditing) {
       reset({
-        codigo: productoActual.codigo || '',
+        sku: productoActual.sku || '',
         nombre: productoActual.nombre || '',
         descripcion: productoActual.descripcion || '',
-        categoria: productoActual.categoria || '',
-        precioBase: productoActual.precioBase || 0,
+        precioBase: productoActual.precioBase ?? '',
       });
     }
   }, [productoActual, isEditing, reset]);
 
   const onSubmit = (data) => {
+    const payload = {
+      sku: data.sku,
+      nombre: data.nombre,
+      descripcion: data.descripcion || null,
+      precioBase: data.precioBase !== '' && data.precioBase != null ? Number(data.precioBase) : null,
+      unidades: [],
+    };
     if (isEditing) {
-      updateProducto({ id, data });
+      updateProducto({ id, data: payload });
     } else {
-      createProducto(data);
+      createProducto(payload);
     }
   };
 
@@ -79,8 +82,8 @@ export const ProductoFormPage = () => {
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField label="Código (SKU)" required error={errors.codigo?.message}>
-                <Input placeholder="Ej. PROD-001" {...register('codigo')} disabled={isEditing} />
+              <FormField label="SKU" required error={errors.sku?.message}>
+                <Input placeholder="Ej. PROD-001" {...register('sku')} />
               </FormField>
 
               <FormField label="Nombre del Producto" required error={errors.nombre?.message}>
@@ -88,21 +91,16 @@ export const ProductoFormPage = () => {
               </FormField>
             </div>
 
-            <FormField label="Categoría" required error={errors.categoria?.message}>
-              <Input placeholder="Ej. Fertilizantes" {...register('categoria')} />
-            </FormField>
-
             <FormField label="Descripción" error={errors.descripcion?.message}>
-              {/* Si no hay Textarea en shadcn todavía, usamos Input o elemento nativo */}
-              <textarea 
+              <textarea
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Descripción detallada del producto..."
                 {...register('descripcion')}
               />
             </FormField>
 
-            <FormField label="Precio Base (COP)" required error={errors.precioBase?.message}>
-              <Input type="number" step="100" placeholder="0" {...register('precioBase')} />
+            <FormField label="Precio Base (COP)" error={errors.precioBase?.message} description="Precio de referencia en la lista Precio Detal. Puede variar en compras o listas especiales.">
+              <Input type="number" step="100" min="0" placeholder="Ej. 25000" {...register('precioBase')} />
             </FormField>
 
             <div className="pt-4 flex justify-end gap-2">

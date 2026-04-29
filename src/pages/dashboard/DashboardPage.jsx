@@ -17,7 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { formatDate } from '../../utils/formatters';
+import { formatDate, formatStock } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 
 /**
@@ -38,12 +38,17 @@ export const DashboardPage = () => {
   const { metricasQuery } = useDashboard(params);
   const { alertasQuery, marcarLeida } = useAlertas(params);
 
-  // Valores por defecto o datos simulados (mock) en caso de que el backend no envíe datos
+  if (metricasQuery.isError) {
+    console.error('[Dashboard] Error en metricasQuery:', metricasQuery.error);
+  }
+
+  // Valores por defecto en caso de que el backend no envíe datos
   const metricas = metricasQuery.data || {
     ventasMes: 0,
     comprasMes: 0,
     productosBajoStockCount: 0,
     transferenciasPendientes: 0,
+    stockTotal: 0,
     ventasMensuales: [
       { name: 'Ene', ventas: 12000000 },
       { name: 'Feb', ventas: 19000000 },
@@ -70,7 +75,7 @@ export const DashboardPage = () => {
       />
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="p-3 bg-success-100 text-success-600 rounded-lg">
@@ -95,6 +100,18 @@ export const DashboardPage = () => {
               <h3 className="text-2xl font-bold text-gray-900">
                 <CurrencyDisplay amount={metricas.comprasMes} />
               </h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6 flex items-center gap-4 cursor-pointer hover:bg-gray-50" onClick={() => navigate('/inventario')}>
+            <div className="p-3 bg-warning-100 text-warning-600 rounded-lg">
+              <Package className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Stock Total</p>
+              <h3 className="text-2xl font-bold text-gray-900">{formatStock(metricas.stockTotal)}</h3>
             </div>
           </CardContent>
         </Card>
@@ -220,7 +237,7 @@ export const DashboardPage = () => {
                         <p className="text-xs text-gray-500">{prod.sucursal}</p>
                       </div>
                       <div className="w-24">
-                        <StockIndicator actual={prod.stockActual} minimo={prod.stockMinimo} maximo={prod.stockMaximo || prod.stockMinimo * 3} />
+                        <StockIndicator current={prod.stockActual} min={prod.stockMinimo} max={prod.stockMaximo || prod.stockMinimo * 3} />
                       </div>
                     </div>
                   ))}

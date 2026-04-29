@@ -34,9 +34,25 @@ export const useInventario = (params) => {
     }
   });
 
+  // Mutación para actualizar la configuración de stock (mínimo y máximo)
+  const actualizarConfigMutation = useMutation({
+    mutationFn: ({ id, config }) => inventarioService.actualizarConfig(id, config),
+    onSuccess: () => {
+      // Se invalida la caché del inventario para que la tabla se actualice con los nuevos valores
+      queryClient.invalidateQueries({ queryKey: ['inventario'] });
+      toast.success('Configuración de stock actualizada exitosamente');
+    },
+    onError: (error) => {
+      const msg = error.response?.data?.message || 'Error al actualizar la configuración de stock';
+      toast.error(msg);
+    }
+  });
+
   return {
     inventarioQuery,
     ajustarStock: ajustarStockMutation.mutate,
     isAjustando: ajustarStockMutation.isPending,
+    actualizarConfig: actualizarConfigMutation.mutate,
+    isActualizandoConfig: actualizarConfigMutation.isPending,
   };
 };

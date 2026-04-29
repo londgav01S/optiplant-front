@@ -6,7 +6,8 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { StockIndicator } from '../../components/common/StockIndicator';
 import { AjusteStockModal } from './AjusteStockModal';
-import { ArrowRightLeft, Search } from 'lucide-react';
+import { ConfigStockModal } from './ConfigStockModal';
+import { ArrowRightLeft, Settings, Search } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
 /**
@@ -24,12 +25,13 @@ export const InventarioPage = () => {
   // Hook de obtención de datos
   // Si no es admin, el backend debería filtrar automáticamente por su sucursal,
   // pero podemos enviar el param explícitamente si la API lo requiere.
-  const { inventarioQuery, ajustarStock, isAjustando } = useInventario({ 
+  const { inventarioQuery, ajustarStock, isAjustando, actualizarConfig, isActualizandoConfig } = useInventario({ 
     search: searchTerm,
     sucursalId: isAdmin ? null : user?.sucursalId 
   });
 
   const [modalAjuste, setModalAjuste] = useState({ isOpen: false, item: null });
+  const [modalConfig, setModalConfig] = useState({ isOpen: false, item: null });
 
   const handleAjuste = (item) => {
     setModalAjuste({ isOpen: true, item });
@@ -41,6 +43,16 @@ export const InventarioPage = () => {
     });
   };
 
+  const handleConfigurar = (item) => {
+    setModalConfig({ isOpen: true, item });
+  };
+
+  const submitConfigurar = (data) => {
+    actualizarConfig(data, {
+      onSuccess: () => setModalConfig({ isOpen: false, item: null })
+    });
+  };
+
   const columns = [
     { header: 'SKU', accessorKey: 'producto.codigo', cell: (row) => row.producto?.codigo || row.productoCodigo },
     { header: 'Producto', accessorKey: 'producto.nombre', cell: (row) => row.producto?.nombre || row.productoNombre },
@@ -49,17 +61,17 @@ export const InventarioPage = () => {
     { header: 'Categoría', accessorKey: 'producto.categoria', cell: (row) => row.producto?.categoria || '-' },
     { 
       header: 'Stock Actual', 
-      accessorKey: 'cantidadActual',
+      accessorKey: 'stockActual',
       cell: (row) => (
         <StockIndicator 
-          current={row.cantidadActual} 
-          min={row.nivelMinimo} 
-          max={row.nivelMaximo} 
+          current={row.stockActual} 
+          min={row.stockMinimo} 
+          max={row.stockMaximo} 
         />
       )
     },
-    { header: 'Nivel Mín.', accessorKey: 'nivelMinimo', className: 'text-gray-500 font-mono text-sm' },
-    { header: 'Nivel Máx.', accessorKey: 'nivelMaximo', className: 'text-gray-500 font-mono text-sm' },
+    { header: 'Nivel Mín.', accessorKey: 'stockMinimo', className: 'text-gray-500 font-mono text-sm' },
+    { header: 'Nivel Máx.', accessorKey: 'stockMaximo', className: 'text-gray-500 font-mono text-sm' },
     {
       header: 'Acciones',
       cell: (row) => (
@@ -67,6 +79,10 @@ export const InventarioPage = () => {
           <Button variant="outline" size="sm" onClick={() => handleAjuste(row)}>
             <ArrowRightLeft className="h-3 w-3 mr-1" />
             Ajustar
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => handleConfigurar(row)}>
+            <Settings className="h-3 w-3 mr-1" />
+            Configurar
           </Button>
         </div>
       )
@@ -108,6 +124,12 @@ export const InventarioPage = () => {
         onAjustar={submitAjuste}
         isAjustando={isAjustando}
       />
-    </div>
+      <ConfigStockModal 
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig({ isOpen: false, item: null })}
+        inventario={modalConfig.item}
+        onActualizar={submitConfigurar}
+        isActualizando={isActualizandoConfig}
+      />    </div>
   );
 };

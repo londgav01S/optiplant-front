@@ -32,10 +32,9 @@ export const ProductosPage = () => {
   };
 
   const columns = [
-    { header: 'Código', accessorKey: 'codigo', className: 'font-mono text-sm' },
+    { header: 'SKU', accessorKey: 'sku', className: 'font-mono text-sm' },
     { header: 'Nombre', accessorKey: 'nombre' },
-    { header: 'Categoría', accessorKey: 'categoria', cell: (row) => row.categoria || '-' },
-    { header: 'Precio Base', accessorKey: 'precioBase', cell: (row) => <CurrencyDisplay amount={row.precioBase} /> },
+    { header: 'Precio Base (Detal)', accessorKey: 'precioBase', cell: (row) => row.precioBase != null ? <CurrencyDisplay amount={row.precioBase} /> : <span className="text-gray-400 text-sm">Sin precio</span> },
     { 
       header: 'Estado', 
       accessorKey: 'activo',

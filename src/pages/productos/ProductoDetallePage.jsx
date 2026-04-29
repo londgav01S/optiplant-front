@@ -53,16 +53,16 @@ export const ProductoDetallePage = () => {
             </div>
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
               <div>
-                <p className="text-sm text-gray-500 font-medium">Código (SKU)</p>
-                <p className="mt-1 font-mono text-gray-900">{producto.codigo}</p>
+                <p className="text-sm text-gray-500 font-medium">SKU</p>
+                <p className="mt-1 font-mono text-gray-900">{producto.sku}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 font-medium">Categoría</p>
-                <p className="mt-1 text-gray-900">{producto.categoria}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 font-medium">Precio Base</p>
-                <p className="mt-1"><CurrencyDisplay amount={producto.precioBase} /></p>
+                <p className="text-sm text-gray-500 font-medium">Precio Base (Detal)</p>
+                <p className="mt-1">
+                  {producto.precioBase != null
+                    ? <CurrencyDisplay amount={producto.precioBase} />
+                    : <span className="text-gray-400">Sin precio asignado</span>}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 font-medium">Estado</p>

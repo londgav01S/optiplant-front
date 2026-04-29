@@ -8,12 +8,19 @@ import { dashboardService } from '../services/dashboardService';
  * @returns {Object} Query con los datos de métricas consolidadas.
  */
 export const useDashboard = (params) => {
-  // Consulta de React Query para traer las métricas principales del sistema
   const metricasQuery = useQuery({
     queryKey: ['dashboard', params],
     queryFn: () => dashboardService.getMetricas(params),
-    staleTime: 60000, // Evita re-consultas innecesarias si los datos tienen menos de 1 min de antigüedad
+    staleTime: 30000,
+    retry: 1,
+    onError: (error) => {
+      console.error('[Dashboard] Error al cargar métricas:', error?.response?.status, error?.response?.data);
+    },
   });
+
+  if (metricasQuery.data !== undefined) {
+    console.log('[Dashboard] Datos recibidos:', metricasQuery.data);
+  }
 
   return {
     metricasQuery

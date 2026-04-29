@@ -93,10 +93,11 @@ export const CompraDetallePage = () => {
                 <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center py-2 border-b border-gray-50 last:border-0">
                   <div className="col-span-1 sm:col-span-6">
                     <p className="font-medium text-gray-900">{det.productoNombre}</p>
-                    <p className="text-xs text-gray-500 sm:hidden">Cant: {det.cantidad} x <CurrencyDisplay amount={det.precioUnitario} /></p>
+                    <p className="text-xs text-gray-400 font-mono">{det.productoSku}</p>
+                    <p className="text-xs text-gray-500 sm:hidden">Cant: {det.cantidadPedida} x <CurrencyDisplay amount={det.precioUnitario} /></p>
                   </div>
                   <div className="hidden sm:block col-span-2 text-center text-gray-700">
-                    {det.cantidad}
+                    {det.cantidadPedida}
                   </div>
                   <div className="hidden sm:block col-span-2 text-right text-gray-700">
                     <CurrencyDisplay amount={det.precioUnitario} />
@@ -126,7 +127,7 @@ export const CompraDetallePage = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500 font-medium">Fecha de Emisión</p>
-              <p className="mt-1 text-gray-900">{formatDate(compra.fecha)}</p>
+              <p className="mt-1 text-gray-900">{formatDate(compra.fechaCreacion)}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500 font-medium">Proveedor</p>

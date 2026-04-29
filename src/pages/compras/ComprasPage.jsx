@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/button';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { CurrencyDisplay } from '../../components/common/CurrencyDisplay';
 import { formatDate } from '../../utils/formatters';
-import { Plus, Eye } from 'lucide-react';
+import { Plus, Eye, PackageCheck, XCircle } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
 /**
@@ -20,13 +20,23 @@ export const ComprasPage = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.rolNombre === 'ADMIN';
 
-  const { comprasQuery } = useCompras({
+  const { comprasQuery, recibirCompra, cancelarCompra, isRecibiendo, isCancelando } = useCompras({
     sucursalId: isAdmin ? null : user?.sucursalId
   });
 
+  const handleRecibir = (id) => {
+    recibirCompra(id);
+  };
+
+  const handleCancelar = (id) => {
+    const confirmed = window.confirm('¿Estás seguro de cancelar esta orden de compra?');
+    if (!confirmed) return;
+    cancelarCompra(id);
+  };
+
   const columns = [
     { header: 'Orden', accessorKey: 'id', className: 'w-16 font-mono text-gray-500' },
-    { header: 'Fecha', accessorKey: 'fecha', cell: (row) => formatDate(row.fecha) },
+    { header: 'Fecha', accessorKey: 'fechaCreacion', cell: (row) => formatDate(row.fechaCreacion) },
     { header: 'Proveedor', accessorKey: 'proveedorNombre' },
     ...(isAdmin ? [{ header: 'Sucursal', accessorKey: 'sucursalNombre' }] : []),
     { header: 'Total', accessorKey: 'total', cell: (row) => <CurrencyDisplay amount={row.total} /> },
@@ -35,6 +45,28 @@ export const ComprasPage = () => {
       header: 'Acciones',
       cell: (row) => (
         <div className="flex items-center gap-2">
+          {row.estado === 'PENDIENTE' && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRecibir(row.id)}
+                disabled={isRecibiendo || isCancelando}
+                title="Marcar como recibida"
+              >
+                <PackageCheck className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleCancelar(row.id)}
+                disabled={isRecibiendo || isCancelando}
+                title="Cancelar orden"
+              >
+                <XCircle className="h-4 w-4 text-danger-500" />
+              </Button>
+            </>
+          )}
           <Button variant="ghost" size="sm" onClick={() => navigate(`/compras/${row.id}`)} title="Ver detalles">
             <Eye className="h-4 w-4 text-info-500 hover:text-info-600" />
           </Button>

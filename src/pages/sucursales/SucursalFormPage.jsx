@@ -9,12 +9,21 @@ import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { useSucursales } from '../../hooks/useSucursales';
+import { useListasPrecios } from '../../hooks/useListasPrecios';
 import { requiredString } from '../../utils/validators';
 
 const sucursalSchema = z.object({
   nombre: requiredString,
   direccion: z.string().optional(),
   telefono: z.string().optional(),
+  idListaPrecios: z.preprocess(
+    (value) => {
+      if (value === '' || value == null) return null;
+      const parsed = Number(value);
+      return Number.isNaN(parsed) ? null : parsed;
+    },
+    z.number().int().positive().nullable().optional()
+  ),
 });
 
 /**
@@ -28,14 +37,17 @@ export const SucursalFormPage = () => {
   const isEditing = id && id !== 'nuevo';
   
   const { getSucursalQuery, createSucursal, updateSucursal, isCreating, isUpdating } = useSucursales();
+  const { listasPreciosQuery } = useListasPrecios();
   const { data: sucursalActual, isLoading } = getSucursalQuery(id);
+  const listasPrecios = listasPreciosQuery.data?.content || listasPreciosQuery.data || [];
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: zodResolver(sucursalSchema),
     defaultValues: {
       nombre: '',
       direccion: '',
-      telefono: ''
+      telefono: '',
+      idListaPrecios: ''
     }
   });
 
@@ -44,16 +56,22 @@ export const SucursalFormPage = () => {
       reset({
         nombre: sucursalActual.nombre || '',
         direccion: sucursalActual.direccion || '',
-        telefono: sucursalActual.telefono || ''
+        telefono: sucursalActual.telefono || '',
+        idListaPrecios: sucursalActual.listaPreciosId ? String(sucursalActual.listaPreciosId) : ''
       });
     }
   }, [sucursalActual, isEditing, reset]);
 
   const onSubmit = (data) => {
+    const payload = {
+      ...data,
+      idListaPrecios: data.idListaPrecios ? Number(data.idListaPrecios) : null,
+    };
+
     if (isEditing) {
-      updateSucursal({ id, data });
+      updateSucursal({ id, data: payload });
     } else {
-      createSucursal(data);
+      createSucursal(payload);
     }
   };
 
@@ -81,6 +99,20 @@ export const SucursalFormPage = () => {
 
             <FormField label="Teléfono" error={errors.telefono?.message}>
               <Input placeholder="Ej. 3001234567" {...register('telefono')} />
+            </FormField>
+
+            <FormField label="Lista de precios" error={errors.idListaPrecios?.message} description="Define qué precio se usará por defecto en las ventas de esta sucursal.">
+              <select
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                {...register('idListaPrecios')}
+              >
+                <option value="">Sin lista asignada</option>
+                {listasPrecios.map((lista) => (
+                  <option key={lista.id} value={lista.id}>
+                    {lista.nombre}
+                  </option>
+                ))}
+              </select>
             </FormField>
 
             <div className="pt-4 flex justify-end gap-2">

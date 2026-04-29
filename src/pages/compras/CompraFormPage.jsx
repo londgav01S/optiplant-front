@@ -11,10 +11,12 @@ import { Card, CardContent } from '../../components/ui/card';
 import { useCompras } from '../../hooks/useCompras';
 import { useProductos } from '../../hooks/useProductos';
 import { useProveedores } from '../../hooks/useProveedores';
+import { useSucursales } from '../../hooks/useSucursales';
 import { CurrencyDisplay } from '../../components/common/CurrencyDisplay';
-import { requiredString } from '../../utils/validators';
 import { Trash2, Plus } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
+import { ROLES } from '../../utils/constants';
+
 
 const compraDetalleSchema = z.object({
   productoId: z.coerce.number().min(1, 'Producto requerido'),
@@ -24,6 +26,7 @@ const compraDetalleSchema = z.object({
 
 const compraSchema = z.object({
   proveedorId: z.coerce.number().min(1, 'Debe seleccionar un proveedor'),
+  sucursalId: z.coerce.number().min(1, 'Debe seleccionar una sucursal'),
   detalles: z.array(compraDetalleSchema).min(1, 'Debe agregar al menos un producto'),
 });
 
@@ -35,20 +38,25 @@ const compraSchema = z.object({
 export const CompraFormPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const isAdmin = user?.rolNombre === ROLES.ADMIN;
   const { createCompra, isCreating } = useCompras();
-  
+
   const { proveedoresQuery } = useProveedores({});
   const proveedores = proveedoresQuery.data?.content || proveedoresQuery.data || [];
-  
+
   const { productosQuery } = useProductos({});
   const productos = productosQuery.data?.content || productosQuery.data || [];
+
+  const { sucursalesQuery } = useSucursales();
+  const sucursales = sucursalesQuery.data?.content || sucursalesQuery.data || [];
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(compraSchema),
     defaultValues: {
       proveedorId: '',
-      detalles: [{ productoId: '', cantidad: 1, precioUnitario: 0 }]
-    }
+      sucursalId: user?.sucursalId ?? '',
+      detalles: [{ productoId: '', cantidad: 1, precioUnitario: 0 }],
+    },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -77,8 +85,14 @@ export const CompraFormPage = () => {
 
   const onSubmit = (data) => {
     const payload = {
-      ...data,
-      sucursalId: user.sucursalId
+      idProveedor: Number(data.proveedorId),
+      idSucursal: Number(data.sucursalId),
+      lineas: data.detalles.map((d) => ({
+        idProducto: Number(d.productoId),
+        cantidadPedida: Number(d.cantidad),
+        precioUnitario: Number(d.precioUnitario),
+        descuento: 0,
+      })),
     };
     createCompra(payload);
   };
@@ -92,18 +106,34 @@ export const CompraFormPage = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card className="mb-6">
-          <CardContent className="pt-6">
-            <FormField label="Proveedor" required error={errors.proveedorId?.message}>
-              <select 
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                {...register('proveedorId')}
-              >
-                <option value="">Seleccione un proveedor...</option>
-                {proveedores.map(p => (
-                  <option key={p.id} value={p.id}>{p.nombre}</option>
-                ))}
-              </select>
-            </FormField>
+          <CardContent className="pt-6 space-y-4">
+            <div className={`grid gap-4 ${isAdmin ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+              <FormField label="Proveedor" required error={errors.proveedorId?.message}>
+                <select
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  {...register('proveedorId')}
+                >
+                  <option value="">Seleccione un proveedor...</option>
+                  {proveedores.map(p => (
+                    <option key={p.id} value={p.id}>{p.nombre}</option>
+                  ))}
+                </select>
+              </FormField>
+
+              {isAdmin && (
+                <FormField label="Sucursal" required error={errors.sucursalId?.message}>
+                  <select
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    {...register('sucursalId')}
+                  >
+                    <option value="">Seleccione una sucursal...</option>
+                    {sucursales.map(s => (
+                      <option key={s.id} value={s.id}>{s.nombre}</option>
+                    ))}
+                  </select>
+                </FormField>
+              )}
+            </div>
           </CardContent>
         </Card>
 

@@ -45,8 +45,8 @@ export const AjusteStockModal = ({ isOpen, onClose, inventario, onAjustar, isAju
   useEffect(() => {
     if (inventario && isOpen) {
       reset({
-        cantidadOriginal: inventario.cantidadActual || 0,
-        cantidadNueva: inventario.cantidadActual || 0,
+        cantidadOriginal: inventario.stockActual || 0,
+        cantidadNueva: inventario.stockActual || 0,
         motivo: ''
       });
     }

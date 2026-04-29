@@ -39,7 +39,7 @@ export const VentaDetallePage = () => {
     }
   };
 
-  const isPendingState = venta.estado === 'PENDIENTE';
+  const isPendingState = venta.estado === 'CONFIRMADA';
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
