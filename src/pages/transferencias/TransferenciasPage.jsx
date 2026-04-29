@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
 import { DataTable } from '../../components/common/DataTable';
 import { useTransferencias } from '../../hooks/useTransferencias';
+import { useSucursales } from '../../hooks/useSucursales';
 import { Button } from '../../components/ui/button';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { formatDate } from '../../utils/formatters';
@@ -24,12 +25,16 @@ export const TransferenciasPage = () => {
   const { transferenciasQuery } = useTransferencias({
     sucursalId: isAdmin ? null : user?.sucursalId
   });
+  const { sucursalesQuery } = useSucursales();
+
+  const sucursales = sucursalesQuery.data || [];
+  const sucursalNombrePorId = new Map(sucursales.map((s) => [s.id, s.nombre]));
 
   const columns = [
     { header: 'ID', accessorKey: 'id', className: 'w-16 font-mono text-gray-500' },
-    { header: 'Fecha', accessorKey: 'fecha', cell: (row) => formatDate(row.fecha) },
-    { header: 'Origen', accessorKey: 'sucursalOrigenNombre' },
-    { header: 'Destino', accessorKey: 'sucursalDestinoNombre' },
+    { header: 'Fecha', accessorKey: 'fechaSolicitud', cell: (row) => formatDate(row.fechaSolicitud) },
+    { header: 'Origen', accessorKey: 'sucursalOrigenId', cell: (row) => sucursalNombrePorId.get(row.sucursalOrigenId) || `#${row.sucursalOrigenId}` },
+    { header: 'Destino', accessorKey: 'sucursalDestinoId', cell: (row) => sucursalNombrePorId.get(row.sucursalDestinoId) || `#${row.sucursalDestinoId}` },
     { 
       header: 'Urgencia', 
       accessorKey: 'urgencia',

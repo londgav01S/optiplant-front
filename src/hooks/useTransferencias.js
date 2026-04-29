@@ -55,12 +55,26 @@ export const useTransferencias = (params) => {
     }
   });
 
+  // Registrar despacho real de una transferencia
+  const despacharMutation = useMutation({
+    mutationFn: ({ id, payload }) => transferenciasService.despachar(id, payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['transferencias'] });
+      queryClient.invalidateQueries({ queryKey: ['transferencias', variables.id] });
+      toast.success('Despacho registrado');
+    },
+    onError: (error) => {
+      const msg = error.response?.data?.message || 'Error al registrar el despacho';
+      toast.error(msg);
+    }
+  });
+
   // Confirmar recepción de una transferencia
   const recibirMutation = useMutation({
-    mutationFn: transferenciasService.recibir,
-    onSuccess: (_, id) => {
+    mutationFn: ({ id, payload }) => transferenciasService.recepcionar(id, payload),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['transferencias'] });
-      queryClient.invalidateQueries({ queryKey: ['transferencias', id] });
+      queryClient.invalidateQueries({ queryKey: ['transferencias', variables.id] });
       toast.success('Transferencia recibida con éxito');
     },
     onError: (error) => {
@@ -83,6 +97,34 @@ export const useTransferencias = (params) => {
     }
   });
 
+  // Aprobar una transferencia
+  const aprobarMutation = useMutation({
+    mutationFn: transferenciasService.aprobar,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['transferencias'] });
+      queryClient.invalidateQueries({ queryKey: ['transferencias', id] });
+      toast.success('Transferencia aprobada');
+    },
+    onError: (error) => {
+      const msg = error.response?.data?.message || 'Error al aprobar la transferencia';
+      toast.error(msg);
+    }
+  });
+
+  // Rechazar una transferencia
+  const rechazarMutation = useMutation({
+    mutationFn: transferenciasService.rechazar,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['transferencias'] });
+      queryClient.invalidateQueries({ queryKey: ['transferencias', id] });
+      toast.success('Transferencia rechazada');
+    },
+    onError: (error) => {
+      const msg = error.response?.data?.message || 'Error al rechazar la transferencia';
+      toast.error(msg);
+    }
+  });
+
   return {
     transferenciasQuery,
     getTransferenciaQuery,
@@ -92,7 +134,14 @@ export const useTransferencias = (params) => {
     isEnviando: enviarMutation.isPending,
     recibirTransferencia: recibirMutation.mutate,
     isRecibiendo: recibirMutation.isPending,
+    recibirTransferenciaCompat: recibirMutation.mutate,
     cancelarTransferencia: cancelarMutation.mutate,
     isCancelando: cancelarMutation.isPending,
+    aprobarTransferencia: aprobarMutation.mutate,
+    isAprobando: aprobarMutation.isPending,
+    rechazarTransferencia: rechazarMutation.mutate,
+    isRechazando: rechazarMutation.isPending,
+    despacharTransferencia: despacharMutation.mutate,
+    isDespachando: despacharMutation.isPending,
   };
 };

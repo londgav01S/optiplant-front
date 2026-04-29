@@ -14,6 +14,14 @@ export const logisticaService = {
   },
 
   /**
+   * Obtiene las transferencias actualmente en tránsito.
+   * @returns {Promise<Array>} Transferencias en tránsito.
+   */
+  getEnTransito: async () => {
+    return await axiosClient.get('/logistica/en-transito');
+  },
+
+  /**
    * Crea una nueva ruta de envío logístico.
    * @param {Object} data - Datos y detalles de la nueva ruta.
    * @returns {Promise<Object>} La ruta creada.

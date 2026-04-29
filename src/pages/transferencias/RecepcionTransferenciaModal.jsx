@@ -34,8 +34,8 @@ export const RecepcionTransferenciaModal = ({ isOpen, onClose, onSave, transfere
         detalles: transferencia.detalles.map(d => ({
           id: d.id,
           productoNombre: d.productoNombre,
-          cantidadEnviada: d.cantidad,
-          cantidadRecibida: d.cantidad // Por defecto asume que llegó todo
+          cantidadEnviada: d.cantidadDespachada ?? d.cantidadSolicitada,
+          cantidadRecibida: d.cantidadDespachada ?? d.cantidadSolicitada // Por defecto asume que llegó todo
         }))
       });
     }
@@ -50,7 +50,7 @@ export const RecepcionTransferenciaModal = ({ isOpen, onClose, onSave, transfere
         
         <form onSubmit={handleSubmit(onSave)} className="space-y-4 mt-4">
           <p className="text-sm text-gray-500 mb-4">
-            Confirme las cantidades recibidas. El stock se sumará automáticamente a <strong>{transferencia?.sucursalDestinoNombre}</strong>.
+            Confirme las cantidades recibidas. El stock se sumará automáticamente a la sucursal de destino.
           </p>
 
           <div className="max-h-64 overflow-y-auto pr-2 space-y-3">

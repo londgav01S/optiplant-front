@@ -39,7 +39,7 @@ export const DespachoModal = ({ isOpen, onClose, onSave, transferencia }) => {
         
         <form onSubmit={handleSubmit(onSave)} className="space-y-4 mt-4">
           <p className="text-sm text-gray-500 mb-4">
-            Al registrar el despacho, el inventario se descontará de <strong>{transferencia?.sucursalOrigenNombre}</strong> y la transferencia pasará a estar <strong>En Tránsito</strong>.
+            Al registrar el despacho, el inventario se descontará de la sucursal de origen y la transferencia pasará a estar <strong>En Tránsito</strong>.
           </p>
 
           <FormField label="Vehículo (Placa)" required>

@@ -1,28 +1,38 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { logisticaService } from '../services/logisticaService';
+import { transferenciasService } from '../services/transferenciasService';
 import { toast } from 'sonner';
 
 /**
  * Hook encargado de la lógica de negocio y las peticiones a la API para el módulo de Logística.
- * 
+ *
  * @param {Object} params - Opciones de filtrado para el listado de rutas.
  * @returns {Object} Query de logística y funciones de mutación.
  */
 export const useLogistica = (params) => {
   const queryClient = useQueryClient();
 
-  // Consulta para obtener las rutas y estados de envíos
   const logisticaQuery = useQuery({
     queryKey: ['logistica', params],
     queryFn: () => logisticaService.getAll(params),
-    staleTime: 30000, // Tiempo de validez en caché
+    staleTime: 30000,
   });
 
-  // Mutación para planificar y crear una nueva ruta logística
+  const enTransitoQuery = useQuery({
+    queryKey: ['logistica', 'en-transito'],
+    queryFn: () => logisticaService.getEnTransito(),
+    staleTime: 30000,
+  });
+
+  const pendientesDespachoQuery = useQuery({
+    queryKey: ['transferencias', { estado: 'EN_PREPARACION' }],
+    queryFn: () => transferenciasService.getAll({ estado: 'EN_PREPARACION' }),
+    staleTime: 30000,
+  });
+
   const createRutaMutation = useMutation({
     mutationFn: logisticaService.createRuta,
     onSuccess: () => {
-      // Refresca la tabla de logística al crear una nueva ruta
       queryClient.invalidateQueries({ queryKey: ['logistica'] });
       toast.success('Ruta creada exitosamente');
     },
@@ -32,11 +42,9 @@ export const useLogistica = (params) => {
     }
   });
 
-  // Mutación para cambiar o actualizar el estado de una ruta existente
   const updateEstadoMutation = useMutation({
     mutationFn: logisticaService.updateEstado,
     onSuccess: () => {
-      // Refresca el listado de rutas para reflejar el nuevo estado (ej. "En Tránsito")
       queryClient.invalidateQueries({ queryKey: ['logistica'] });
       toast.success('Estado de ruta actualizado');
     },
@@ -46,11 +54,43 @@ export const useLogistica = (params) => {
     }
   });
 
+  const despacharMutation = useMutation({
+    mutationFn: ({ id, payload }) => transferenciasService.despachar(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transferencias'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica'] });
+      toast.success('Despacho registrado correctamente');
+    },
+    onError: (error) => {
+      const msg = error.response?.data?.message || 'Error al registrar el despacho';
+      toast.error(msg);
+    }
+  });
+
+  const recibirMutation = useMutation({
+    mutationFn: ({ id, payload }) => transferenciasService.recepcionar(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transferencias'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica'] });
+      toast.success('Recepción registrada correctamente');
+    },
+    onError: (error) => {
+      const msg = error.response?.data?.message || 'Error al registrar la recepción';
+      toast.error(msg);
+    }
+  });
+
   return {
     logisticaQuery,
+    enTransitoQuery,
+    pendientesDespachoQuery,
     createRuta: createRutaMutation.mutate,
     isCreating: createRutaMutation.isPending,
     updateEstado: updateEstadoMutation.mutate,
     isUpdating: updateEstadoMutation.isPending,
+    despacharTransferencia: despacharMutation.mutate,
+    isDespachando: despacharMutation.isPending,
+    recibirTransferencia: recibirMutation.mutate,
+    isRecibiendo: recibirMutation.isPending,
   };
 };

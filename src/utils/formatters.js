@@ -36,3 +36,26 @@ export const formatPercent = (n) => {
     maximumFractionDigits: 2,
   }).format(n) + ' %';
 };
+
+export const formatCurrencyCompact = (amount) => {
+  if (amount === null || amount === undefined) return '$0';
+  
+  let displayAmount = amount;
+  let suffix = '';
+  
+  if (amount >= 1000000000) {
+    displayAmount = amount / 1000000000;
+    suffix = 'B';
+  } else if (amount >= 1000000) {
+    displayAmount = amount / 1000000;
+    suffix = 'M';
+  } else if (amount >= 1000) {
+    displayAmount = amount / 1000;
+    suffix = 'K';
+  }
+  
+  return new Intl.NumberFormat('es-CO', {
+    minimumFractionDigits: suffix ? 1 : 0,
+    maximumFractionDigits: suffix ? 1 : 0,
+  }).format(displayAmount) + suffix;
+};

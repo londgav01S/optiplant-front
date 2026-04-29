@@ -6,6 +6,7 @@ import { MainLayout } from './components/layout/MainLayout';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
 import useAuthStore from './store/authStore';
+import { getDefaultRouteForRole } from './utils/roleGuards';
 
 // Sucursales
 import { SucursalesPage } from './pages/sucursales/SucursalesPage';
@@ -55,6 +56,11 @@ import { DashboardPage } from './pages/dashboard/DashboardPage';
 // Vistas placeholder (se reemplazarán luego)
 const ForbiddenPage = () => <div className="p-8 text-danger-500">No tienes permiso para ver esta página.</div>;
 
+const HomeRedirect = () => {
+  const user = useAuthStore(state => state.user);
+  return <Navigate to={getDefaultRouteForRole(user)} replace />;
+};
+
 export default function App() {
   const checkAuth = useAuthStore(state => state.checkAuth);
 
@@ -72,7 +78,11 @@ export default function App() {
 
         {/* Rutas Privadas */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <HomeRedirect />
+            </ProtectedRoute>
+          } />
           
           <Route path="/dashboard" element={
             <ProtectedRoute allowedRoles={['ADMIN', 'GERENTE']}>
@@ -223,9 +233,9 @@ export default function App() {
             </ProtectedRoute>
           } />
 
-          {/* ALERTAS (ADMIN, GERENTE) */}
+          {/* ALERTAS (ADMIN, GERENTE, OPERADOR) */}
           <Route path="/alertas" element={
-            <ProtectedRoute allowedRoles={['ADMIN', 'GERENTE']}>
+            <ProtectedRoute allowedRoles={['ADMIN', 'GERENTE', 'OPERADOR']}>
               <AlertasPage />
             </ProtectedRoute>
           } />

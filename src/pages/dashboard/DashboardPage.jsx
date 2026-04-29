@@ -17,7 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { formatDate, formatStock } from '../../utils/formatters';
+import { formatDate, formatStock, formatCurrencyCompact } from '../../utils/formatters';
 import { Button } from '../../components/ui/button';
 
 /**
@@ -81,10 +81,10 @@ export const DashboardPage = () => {
             <div className="p-3 bg-success-100 text-success-600 rounded-lg">
               <TrendingUp className="h-6 w-6" />
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-500">Ventas (Este Mes)</p>
-              <h3 className="text-2xl font-bold text-gray-900">
-                <CurrencyDisplay amount={metricas.ventasMes} />
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                ${formatCurrencyCompact(metricas.ventasMes)}
               </h3>
             </div>
           </CardContent>
@@ -95,10 +95,10 @@ export const DashboardPage = () => {
             <div className="p-3 bg-info-100 text-info-600 rounded-lg">
               <ShoppingCart className="h-6 w-6" />
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-500">Compras (Este Mes)</p>
-              <h3 className="text-2xl font-bold text-gray-900">
-                <CurrencyDisplay amount={metricas.comprasMes} />
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                ${formatCurrencyCompact(metricas.comprasMes)}
               </h3>
             </div>
           </CardContent>

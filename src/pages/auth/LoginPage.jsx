@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { useAuth } from '../../hooks/useAuth';
 import useAuthStore from '../../store/authStore';
+import { getDefaultRouteForRole } from '../../utils/roleGuards';
 import { Package } from 'lucide-react';
 
 /**
@@ -20,13 +21,14 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const { login, isLoggingIn, loginError } = useAuth();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const user = useAuthStore(state => state.user);
 
-  // Si ya está autenticado, redirigir al dashboard
+  // Si ya está autenticado, redirigir a la primera ruta permitida para su rol
   React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+    if (isAuthenticated && user) {
+      navigate(getDefaultRouteForRole(user), { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema),

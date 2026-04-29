@@ -11,59 +11,89 @@ import { Card, CardContent } from '../../components/ui/card';
 import { useTransferencias } from '../../hooks/useTransferencias';
 import { useProductos } from '../../hooks/useProductos';
 import { useSucursales } from '../../hooks/useSucursales';
+import { useInventario } from '../../hooks/useInventario';
 import { Trash2, Plus, ArrowRight, AlertCircle } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
-const transferenciaDetalleSchema = z.object({
-  productoId: z.coerce.number().min(1, 'Producto requerido'),
-  cantidad: z.coerce.number().min(1, 'Mínimo 1'),
+const lineaTransferenciaSchema = z.object({
+  idProducto: z.coerce.number().min(1, 'Producto requerido'),
+  cantidadSolicitada: z.coerce.number().min(1, 'Mínimo 1'),
 });
 
 const transferenciaSchema = z.object({
-  sucursalOrigenId: z.coerce.number().min(1, 'Origen requerido'),
-  sucursalDestinoId: z.coerce.number().min(1, 'Destino requerido'),
+  idSucursalOrigen: z.coerce.number().min(1, 'Origen requerido'),
+  idSucursalDestino: z.coerce.number().min(1, 'Destino requerido'),
   urgencia: z.enum(['NORMAL', 'ALTA']),
   observaciones: z.string().optional(),
-  detalles: z.array(transferenciaDetalleSchema).min(1, 'Debe agregar al menos un producto'),
-}).refine(data => data.sucursalOrigenId !== data.sucursalDestinoId, {
+  lineas: z.array(lineaTransferenciaSchema).min(1, 'Debe agregar al menos un producto'),
+}).refine(data => data.idSucursalOrigen !== data.idSucursalDestino, {
   message: "El origen y destino no pueden ser la misma sucursal",
-  path: ["sucursalDestinoId"]
+  path: ["idSucursalDestino"]
 });
 
 /**
  * Formulario para Solicitar una Nueva Transferencia de Inventario.
  * Captura las sucursales de origen y destino (evitando que sean la misma)
  * y la lista de productos solicitados. Solo ADMIN puede cambiar el origen.
+ * Valida que los productos seleccionados tengan stock en la sucursal origen.
  */
 export const TransferenciaFormPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const isAdmin = user?.rolNombre === 'ADMIN';
+  const [inventarioStock, setInventarioStock] = useState({});
 
   const { createTransferencia, isCreating } = useTransferencias({});
   const { sucursalesQuery } = useSucursales();
   const { productosQuery } = useProductos({});
+  const { inventarioQuery } = useInventario({ sucursalId: null });
   
   const sucursales = sucursalesQuery.data || [];
   const productos = productosQuery.data?.content || productosQuery.data || [];
+  const inventarios = inventarioQuery.data?.content || inventarioQuery.data || [];
 
-  const { register, control, handleSubmit, formState: { errors } } = useForm({
+  // Construir mapa de stock: sucursalId -> productoId -> stockActual
+  useEffect(() => {
+    const stock = {};
+    inventarios.forEach(inv => {
+      if (!stock[inv.sucursalId]) {
+        stock[inv.sucursalId] = {};
+      }
+      stock[inv.sucursalId][inv.productoId] = inv.stockActual || 0;
+    });
+    setInventarioStock(stock);
+  }, [inventarios]);
+
+  const { register, control, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(transferenciaSchema),
     defaultValues: {
-      sucursalOrigenId: isAdmin ? '' : user.sucursalId,
-      sucursalDestinoId: '',
+      idSucursalOrigen: isAdmin ? '' : String(user?.sucursalId || ''),
+      idSucursalDestino: '',
       urgencia: 'NORMAL',
       observaciones: '',
-      detalles: [{ productoId: '', cantidad: 1 }]
+      lineas: [{ idProducto: '', cantidadSolicitada: 1 }]
     }
   });
 
-  const { fields, append, remove } = useFieldArray({ control, name: "detalles" });
+  const { fields, append, remove } = useFieldArray({ control, name: "lineas" });
+  const sucursalOrigenWatch = watch('idSucursalOrigen');
+
+  // Filtrar productos que tienen stock en la sucursal origen
+  const productosConStock = productos.filter(p => {
+    const stockDisponible = inventarioStock[Number(sucursalOrigenWatch)]?.[p.id] || 0;
+    return stockDisponible > 0;
+  });
 
   const onSubmit = (data) => {
     const payload = {
       ...data,
-      sucursalOrigenId: isAdmin ? data.sucursalOrigenId : user.sucursalId
+      idSucursalOrigen: isAdmin ? Number(data.idSucursalOrigen) : user.sucursalId,
+      idSucursalDestino: Number(data.idSucursalDestino),
+      lineas: data.lineas.map(l => ({
+        ...l,
+        idProducto: Number(l.idProducto),
+        cantidadSolicitada: Number(l.cantidadSolicitada)
+      }))
     };
     createTransferencia(payload);
   };
@@ -95,10 +125,10 @@ export const TransferenciaFormPage = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información de la Ruta</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative mb-6">
-              <FormField label="Sucursal Origen" required error={errors.sucursalOrigenId?.message}>
+              <FormField label="Sucursal Origen" required error={errors.idSucursalOrigen?.message}>
                 <select 
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  {...register('sucursalOrigenId')}
+                  {...register('idSucursalOrigen')}
                   disabled={!isAdmin}
                 >
                   <option value="">Seleccione origen...</option>
@@ -110,10 +140,10 @@ export const TransferenciaFormPage = () => {
                 <ArrowRight className="h-6 w-6 text-gray-400" />
               </div>
 
-              <FormField label="Sucursal Destino" required error={errors.sucursalDestinoId?.message}>
+              <FormField label="Sucursal Destino" required error={errors.idSucursalDestino?.message}>
                 <select 
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  {...register('sucursalDestinoId')}
+                  {...register('idSucursalDestino')}
                 >
                   <option value="">Seleccione destino...</option>
                   {sucursales.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
@@ -146,27 +176,40 @@ export const TransferenciaFormPage = () => {
           <CardContent className="pt-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Productos a Solicitar</h3>
-              <Button type="button" variant="outline" size="sm" onClick={() => append({ productoId: '', cantidad: 1 })}>
+              <Button type="button" variant="outline" size="sm" onClick={() => append({ idProducto: '', cantidadSolicitada: 1 })}>
                 <Plus className="h-4 w-4 mr-1" /> Agregar Línea
               </Button>
             </div>
+
+            {productosConStock.length === 0 && sucursalOrigenWatch && (
+              <div className="p-4 bg-warning-50 border border-warning-200 text-warning-700 rounded-lg mb-4">
+                <p className="text-sm">No hay productos con stock disponible en la sucursal origen seleccionada.</p>
+              </div>
+            )}
 
             <div className="space-y-4">
               {fields.map((field, index) => (
                 <div key={field.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField label="Producto" required error={errors.detalles?.[index]?.productoId?.message}>
+                    <FormField label="Producto" required error={errors.lineas?.[index]?.idProducto?.message}>
                       <select 
                         className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        {...register(`detalles.${index}.productoId`)}
+                        {...register(`lineas.${index}.idProducto`)}
                       >
                         <option value="">Seleccione...</option>
-                        {productos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                        {productosConStock.map(p => {
+                          const stock = inventarioStock[Number(sucursalOrigenWatch)]?.[p.id] || 0;
+                          return (
+                            <option key={p.id} value={p.id}>
+                              {p.nombre} (Disponible: {stock})
+                            </option>
+                          );
+                        })}
                       </select>
                     </FormField>
 
-                    <FormField label="Cantidad solicitada" required error={errors.detalles?.[index]?.cantidad?.message}>
-                      <Input type="number" min="1" {...register(`detalles.${index}.cantidad`)} />
+                    <FormField label="Cantidad solicitada" required error={errors.lineas?.[index]?.cantidadSolicitada?.message}>
+                      <Input type="number" min="1" {...register(`lineas.${index}.cantidadSolicitada`)} />
                     </FormField>
                   </div>
                   

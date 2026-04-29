@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
-import { canAccess } from '../../utils/roleGuards';
+import { canAccess, getDefaultRouteForRole } from '../../utils/roleGuards';
 
 /**
  * Componente envoltorio para proteger rutas privadas.
@@ -29,8 +29,8 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
 
   // Si la ruta requiere roles específicos, verifica contra el rol del usuario
   if (allowedRoles && !canAccess(user, allowedRoles)) {
-    // Si no tiene permisos, redirigir a no autorizado (por ahora a /403, si existe)
-    return <Navigate to="/403" replace />;
+    // Si no tiene permisos, redirigir a una ruta segura para su rol
+    return <Navigate to={getDefaultRouteForRole(user)} replace />;
   }
 
   // Si todo está correcto, renderiza la vista solicitada

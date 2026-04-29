@@ -39,7 +39,7 @@ const MENU_ITEMS = [
     category: 'Análisis',
     items: [
       { name: 'Alertas', path: '/alertas', icon: Bell, roles: ['ADMIN', 'GERENTE', 'OPERADOR'] },
-      { name: 'Logística', path: '/logistica', icon: Truck, roles: ['ADMIN', 'GERENTE'] },
+      { name: 'Logística', path: '/logistica', icon: Truck, roles: ['ADMIN', 'GERENTE', 'OPERADOR'] },
     ]
   },
   {
